@@ -39,11 +39,14 @@ app.get('/update', async (req,res)=>{
 app.get('/userinfo', async (req, res)=>{
   let {code, state} = req.query 
   if(code){
-    let TokenAPIResponse = await getAccessToken(code) 
-    let { access_token, openid } = TokenAPIResponse
-    let userinfo = await getUserinfo( access_token, openid ) 
-
-    res.json(userinfo)
+    try{
+      let TokenAPIResponse = await getAccessToken(code) 
+      let { access_token, openid } = TokenAPIResponse
+      let userinfo = await getUserinfo( access_token, openid ) 
+      res.json(userinfo)
+    }catch(e){
+      res.json({error: e.message}) 
+    }
   } 
   else{ 
     res.send('<h1>Welcome to /userinfo </h1>')
@@ -68,9 +71,19 @@ async function getAccessToken(code){
     +`&secret=${appSecret}&code=${code}&grant_type=${grantType}`
 
   let TokenAPIResponse = await axios(wxAccessTokenAPI)
-    .then(r=>(r.data))
+    .then(
+      (r)=>{
+        if(r.data.errcode){
+          throw new Error(r.data.errmsg) 
+        }
+        else{
+          return r.data 
+        } 
+      } 
+    )
     .catch(e =>{
       console.log( 'error during requesting wxAccessTokenAPI  ')
+      throw e
     })
 
   return TokenAPIResponse 
