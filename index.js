@@ -4,7 +4,7 @@ const express = require('express')
 const axios = require('axios') 
 
 let app = express()
-const PORT = 8002 
+const PORT = process.env.PORT ||8002 
 
 app.listen(PORT, ()=>{
   console.log(`server is now running on ${PORT}`) 
@@ -61,7 +61,7 @@ app.get('/', async (req,res)=>{
     res.send({data:TokenAPIResponse})
   }
   else{
-    res.send('<h1>Welcome to index page</h1>') }
+    res.send('<h1>Welcome to index page of WX OAuth Callback Server</h1>') }
 })
 
 
